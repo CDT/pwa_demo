@@ -1,9 +1,20 @@
-const express = require('express')
+const express = require('express');
+const https = require('https');
+const fs = require('fs');
 
-const app = express() // serve static files from the "static" directory
+const app = express();
 
-app.use(require('connect-history-api-fallback')())
+// Serve static files from the "public" directory
+app.use(express.static('.'));
 
-app.use(express.static('.')) // listen on port 8080
+// Create an HTTPS server with self-signed certificates
+const options = {
+  key: fs.readFileSync('./ssl/server.key'),
+  cert: fs.readFileSync('./ssl/server.cert')
+};
 
-app.listen(8080, () => { console.log('Server running on port 8080')})
+const server = https.createServer(options, app);
+
+server.listen(3000, () => {
+  console.log('Server listening on port 3000 (HTTPS)');
+});
